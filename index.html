@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Digital Clock</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dark">
+  <main class="clock-wrap">
+    <!-- Toggle button -->
+    <button id="toggleMode">Switch to Light Mode</button>
+
+    <!-- Time -->
+    <time id="time" class="clock" datetime="" aria-live="polite">00:00:00 AM</time>
+    <!-- Date -->
+    <p id="date" class="date">Mon, Jan 01, 2025</p>
+    <!-- Seconds progress bar -->
+    <div class="seconds-bar">
+      <div id="seconds-fill"></div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
