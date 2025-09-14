@@ -1,24 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Digital Clock</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Clock</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark">
   <main class="clock-wrap">
-    <!-- Toggle button -->
+
+    <!-- Theme Toggle -->
     <button id="toggleMode">Switch to Light Mode</button>
 
-    <!-- Time -->
+    <!-- Clock Type Toggle -->
+    <button id="toggleClockType">Switch to Analog</button>
+
+    <!-- Time Zone Selector -->
+    <select id="timezoneSelect">
+      <option value="local">Local</option>
+      <option value="UTC">UTC</option>
+      <option value="America/New_York">New York (EST)</option>
+      <option value="Europe/London">London (GMT)</option>
+      <option value="Asia/Tokyo">Tokyo (JST)</option>
+    </select>
+
+    <!-- Digital Clock -->
     <time id="time" class="clock" datetime="" aria-live="polite">00:00:00 AM</time>
-    <!-- Date -->
     <p id="date" class="date">Mon, Jan 01, 2025</p>
-    <!-- Seconds progress bar -->
     <div class="seconds-bar">
       <div id="seconds-fill"></div>
     </div>
+
+    <!-- Analog Clock -->
+    <canvas id="analogClock" width="250" height="250"></canvas>
+
+    <!-- Customization -->
+    <div class="customization">
+      <label for="colorPicker">Clock Color:</label>
+      <input type="color" id="colorPicker" value="#1e90ff">
+      <label for="fontPicker">Font:</label>
+      <select id="fontPicker">
+        <option value="Arial, Helvetica, sans-serif">Arial</option>
+        <option value="Verdana, Geneva, sans-serif">Verdana</option>
+        <option value="'Courier New', Courier, monospace">Courier</option>
+        <option value="'Times New Roman', Times, serif">Times</option>
+      </select>
+    </div>
+
   </main>
 
   <script src="script.js"></script>
