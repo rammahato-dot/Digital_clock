@@ -1,65 +1,132 @@
-* { box-sizing: border-box; margin:0; padding:0; }
+const timeEl = document.getElementById('time');
+const dateEl = document.getElementById('date');
+const secondsFill = document.getElementById('seconds-fill');
+const toggleBtn = document.getElementById('toggleMode');
+const toggleClockType = document.getElementById('toggleClockType');
+const timezoneSelect = document.getElementById('timezoneSelect');
+const analogClock = document.getElementById('analogClock');
+const colorPicker = document.getElementById('colorPicker');
+const fontPicker = document.getElementById('fontPicker');
+const body = document.body;
+const clockWrap = document.querySelector('.clock-wrap');
+const ctx = analogClock.getContext('2d');
 
-body {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  transition: background 0.4s, color 0.4s;
+let showAnalog = false;
+
+// --- Update Clock ---
+function updateClock() {
+  const now = getTimeInZone(timezoneSelect.value);
+
+  // --- Digital Clock ---
+  let hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12;
+
+  const hh = String(hours).padStart(2,'0');
+  const mm = String(minutes).padStart(2,'0');
+  const ss = String(seconds).padStart(2,'0');
+
+  if(!showAnalog) {
+    timeEl.style.display = 'block';
+    dateEl.style.display = 'block';
+    secondsFill.parentElement.style.display = 'block';
+    analogClock.style.display = 'none';
+
+    timeEl.textContent = `${hh}:${mm}:${ss} ${ampm}`;
+    timeEl.setAttribute('datetime', now.toISOString());
+
+    const options = { weekday:'short', year:'numeric', month:'short', day:'numeric' };
+    dateEl.textContent = now.toLocaleDateString('en-US', options);
+
+    secondsFill.style.width = `${(seconds/60)*100}%`;
+  } else {
+    timeEl.style.display = 'none';
+    dateEl.style.display = 'none';
+    secondsFill.parentElement.style.display = 'none';
+    analogClock.style.display = 'block';
+    drawAnalogClock(hours, minutes, seconds);
+  }
+
+  // Drift-free update
+  const delay = 1000 - now.getMilliseconds();
+  setTimeout(updateClock, delay);
 }
 
-body.light { background: white; color: black; }
-body.dark { background: #121212; color: white; }
-
-.clock-wrap {
-  text-align: center;
-  padding: 2rem;
-  border-radius: 12px;
-  transition: background 0.4s, color 0.4s;
-}
-body.light .clock-wrap { background: #f4f4f4; }
-body.dark .clock-wrap { background: #1e1e1e; }
-
-button {
-  margin: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+// --- Time zone helper ---
+function getTimeInZone(zone) {
+  if(zone === 'local') return new Date();
+  return new Date(new Date().toLocaleString("en-US", {timeZone: zone}));
 }
 
-body.light button { background: black; color: white; }
-body.dark button { background: white; color: black; }
+// --- Analog Clock Drawing ---
+function drawAnalogClock(h, m, s) {
+  const radius = analogClock.width/2;
+  ctx.clearRect(0,0,analogClock.width, analogClock.height);
 
-#timezoneSelect { margin: 0.5rem; padding: 0.4rem; border-radius: 6px; }
+  ctx.translate(radius,radius);
+  ctx.rotate(-Math.PI/2);
 
-.clock {
-  display: block;
-  font-weight: bold;
-  font-size: clamp(2.5rem, 12vw, 5rem);
-  margin-bottom: 0.5rem;
+  // Clock circle
+  ctx.beginPath();
+  ctx.arc(0,0,radius-5,0,2*Math.PI);
+  ctx.strokeStyle = colorPicker.value;
+  ctx.lineWidth = 8;
+  ctx.stroke();
+
+  // Hour hand
+  ctx.save();
+  ctx.rotate((Math.PI/6*h) + (Math.PI/360*m));
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(radius*0.5,0);
+  ctx.strokeStyle = colorPicker.value;
+  ctx.lineWidth = 6;
+  ctx.stroke();
+  ctx.restore();
+
+  // Minute hand
+  ctx.save();
+  ctx.rotate((Math.PI/30*m) + (Math.PI/1800*s));
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(radius*0.7,0);
+  ctx.strokeStyle = colorPicker.value;
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.restore();
+
+  // Second hand
+  ctx.save();
+  ctx.rotate(Math.PI/30*s);
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(radius*0.9,0);
+  ctx.strokeStyle = colorPicker.value;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.resetTransform();
 }
 
-.date { font-size: 1.2rem; margin-bottom: 1rem; }
+// --- Theme toggle ---
+toggleBtn.addEventListener('click', ()=>{
+  body.classList.toggle('light');
+  body.classList.toggle('dark');
+  toggleBtn.textContent = body.classList.contains('light') ? "Switch to Dark Mode" : "Switch to Light Mode";
+});
 
-.seconds-bar {
-  width: 100%;
-  max-width: 300px;
-  height: 6px;
-  border-radius: 4px;
-  background: gray;
-  overflow: hidden;
-  margin: 0 auto 1rem auto;
-}
-#seconds-fill {
-  height: 100%;
-  background: dodgerblue;
-  width: 0%;
-  transition: width 1s linear;
-}
+// --- Clock type toggle ---
+toggleClockType.addEventListener('click', ()=>{
+  showAnalog = !showAnalog;
+  toggleClockType.textContent = showAnalog ? "Switch to Digital" : "Switch to Analog";
+});
 
-/* Analog clock canvas hidden by default */
-#analogClock { display: none; margin: 1rem auto; }
+// --- Color and Font customization ---
+colorPicker.addEventListener('input', ()=>{ timeEl.style.color = colorPicker.value; });
+fontPicker.addEventListener('change', ()=>{ timeEl.style.fontFamily = fontPicker.value; });
 
-/* Customization */
-.customization { margin-top: 1rem; }
-.customization label { margin-right: 0.5rem; }
+updateClock();
