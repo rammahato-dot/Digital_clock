@@ -9,8 +9,8 @@ body {
 
 /* --- Light & Dark themes --- */
 body.light {
-  background: white;
-  color: black;
+  background: rgb(8, 13, 57);
+  color: rgb(72, 5, 5);
 }
 body.dark {
   background: #121212;
